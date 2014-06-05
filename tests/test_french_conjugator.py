@@ -158,6 +158,20 @@ class TestClozeDeletionOutputRules(unittest.TestCase):
             self.assertEqual(expected.spp, actual.spp)
             self.assertEqual(expected.tpp, actual.tpp)
 
+    def test_normal_view(self):
+        expected =\
+['parler, Présent:',
+'⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯',
+'je parle                 ‖ nous parlons',
+'tu parles                ‖ vous parlez',
+'il/elle/on parle         ‖ ils/elles parlent'
+]
 
+        conj = French.construct_inflection('parler', 'Présent')
+        actual = French.output_normal_view('parler', 'Présent', conj)
+        with self.subTest():
+            self.assertEqual(expected, actual)
+
+        self.assertEqual
 if __name__ == '__main__':
     unittest.main()

@@ -115,17 +115,18 @@ def construct_inflection(infinitive, tense):
                                                      stem_and_ending)])
 
 
-def print_normal_view(infinitive, tense, result):
+def output_normal_view(infinitive, tense, conj):
     '''
     Pretty-printing for the traditional two-column output
     of a verb conjugation
     '''
-    print('\n{}, {}:'.format(infinitive, tense))
-    print('⎯'*45)
-    print('{:<25}‖ {}'.format(result.fps, result.fpp))
-    print('{:<25}‖ {}'.format(result.sps, result.spp))
-    print('{:<25}‖ {}'.format(result.tps, result.tpp))
-    print()
+    return ['{}, {}:'.format(infinitive, tense),
+    ('⎯'*45), '{:<25}‖ {}'.format('{} {}'.format(*conj.fps),
+                                  '{} {}'.format(*conj.fpp)),
+    '{:<25}‖ {}'.format('{} {}'.format(*conj.sps),
+                        '{} {}'.format(*conj.spp)),
+    '{:<25}‖ {}'.format('{} {}'.format(*conj.tps),
+                        '{} {}'. format(*conj.tpp))]
 
 
 def output_cloze(infinitive, tense):
