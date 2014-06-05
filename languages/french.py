@@ -100,7 +100,8 @@ def construct_stem_and_ending(infinitive, tense):
     ending
     '''
     stem = _STEM_RULES[tense](infinitive)
-    endings = _ENDINGS[infinitive[-2:]][tense]
+    verb_type = infinitive[-2:]
+    endings = _ENDINGS[verb_type][tense]
     return Category._make([stem + end for end in endings])
 
 

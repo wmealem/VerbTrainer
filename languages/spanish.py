@@ -51,9 +51,8 @@ _STEM_RULES =\
 }
 
 
-def construct_inflection(infinitive, tense):
+def construct_stem_and_ending(infinitive, tense):
     stem = _STEM_RULES[tense](infinitive)
     verb_type = infinitive[-2:]
-    end = _ENDINGS[verb_type][tense]
-
-    return SpanishCategory._make([stem + e for e in end])
+    endings = _ENDINGS[verb_type][tense]
+    return SpanishCategory._make([stem + end for end in endings])

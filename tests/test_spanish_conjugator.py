@@ -52,7 +52,7 @@ class TestSpanishConjugator(unittest.TestCase):
         self.run_sub_tests(expected, 'pretérito indefinido')
 
     def run_sub_tests(self, expected, tense):
-        conj = partial(Spanish.construct_inflection, tense=tense)
+        conj = partial(Spanish.construct_stem_and_ending, tense=tense)
         for i, verb in enumerate(TestSpanishConjugator.test_verbs):
             with self.subTest(verb=verb, tense=tense):
                 [self.assertEqual(expect, actual) for expect, actual in
