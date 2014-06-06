@@ -16,9 +16,10 @@ _PRONOUNS = Category((lambda stem: "j'" if stem[0]
                      (lambda stem: 'vous'),
                      (lambda stem: 'ils/elles'))
 
-_FPS_FORMAT = '{0}{{{{c1::{1}::{2}, {3}}}}}'
-
-_STD_FORMAT = '{0} {{{{c1::{1}::{2}, {3}}}}}'
+_FPS_FORMAT = '{}{}'
+_STD_FORMAT = '{} {}'
+_FPS_CLOZE_FORMAT = '{0}{{{{c1::{1}::{2}, {3}}}}}'
+_STD_CLOZE_FORMAT = '{0} {{{{c1::{1}::{2}, {3}}}}}'
 
 _VOWELS = ('a', 'e', 'i', 'o', 'u')
 
@@ -121,12 +122,14 @@ def output_normal_view(infinitive, tense, conj):
     of a verb conjugation
     '''
     return ['{}, {}:'.format(infinitive, tense),
-    ('⎯'*45), '{:<25}‖ {}'.format('{} {}'.format(*conj.fps),
-                                  '{} {}'.format(*conj.fpp)),
-    '{:<25}‖ {}'.format('{} {}'.format(*conj.sps),
-                        '{} {}'.format(*conj.spp)),
-    '{:<25}‖ {}'.format('{} {}'.format(*conj.tps),
-                        '{} {}'. format(*conj.tpp))]
+    ('⎯'*45), '{:<25}‖ {}'.format(_FPS_FORMAT.format(*conj.fps) if
+                                  infinitive[0] in _VOWELS else
+                                  _STD_FORMAT.format(*conj.fps),
+                                  _STD_FORMAT.format(*conj.fpp)),
+    '{:<25}‖ {}'.format(_STD_FORMAT.format(*conj.sps),
+                        _STD_FORMAT.format(*conj.spp)),
+    '{:<25}‖ {}'.format(_STD_FORMAT.format(*conj.tps),
+                        _STD_FORMAT. format(*conj.tpp))]
 
 
 def output_cloze(infinitive, tense, conj):
@@ -139,10 +142,10 @@ def output_cloze(infinitive, tense, conj):
     # TODO - make this pythonic, it's an ugly hack as it is
     for i, item in enumerate(conj):
         if i == 0 and infinitive[0] in _VOWELS:
-            result.append(_FPS_FORMAT.format(item[0], item[1],
+            result.append(_FPS_CLOZE_FORMAT.format(item[0], item[1],
                                              infinitive, tense))
         else:
-            result.append(_STD_FORMAT.format(item[0], item[1],
+            result.append(_STD_CLOZE_FORMAT.format(item[0], item[1],
                                              infinitive, tense))
     return Category._make(result)
 
