@@ -11,8 +11,7 @@ def main():
                        }
 
     task_choice = {'1': conjugate_verb,
-                   '2': write_import,
-                   '3': goodbye}
+                   '2': goodbye}
 
     language = language_choice[input('Choose a language: 1) castellano 2) français\n'
                                      "Type '1' or '2', then press 'Enter' > ")]
@@ -20,65 +19,55 @@ def main():
     while True:
 
         task = task_choice[input('What would you like to do?\n'
-                                 '1) conjugate a verb and display it to the screen\n'
-                                 '2) conjugate a verb and export to a file for Anki import\n'
-                                 '3) Quit\n'
-                                 "Type '1', '2', or '3' then press 'Enter' > ")]
+                                 '1) conjugate a verb\n'
+                                 '2) Quit\n'
+                                 "Type '1' or '2' then press 'Enter' > ")]
 
         task(language)
 
 
-
-
-
-
-    #print("Choose a task: 1) Export to Anki-compatible import file\n > ")
-    choice = {'1': 'Présent',
-              '2': 'Imparfait',
-              '3': 'Passé simple',
-              '4': 'Futur',
-              '5': 'Conditionnel'}
-
-    with open('import.txt', 'w') as f:
-
-        while (True):
-            infinitive = input('Infinitive? > ')
-            tense = choice[input('1) Présent 2) Imparfait 3) Passé simple\n'
-                                 '4) Futur 5) Conditionnel > ')]
-
-            conj = French.construct_inflection(infinitive, tense)
-            rules = French._cloze_import_rules
-
-            to_write = [func(c, infinitive, tense)
-                        for func, c in zip(rules, conj)]
-            [write_to_file(f, item) for item in to_write]
-
-            print('{} of {} was written to file.'.format(tense, infinitive))
-
-            quit = input('Continue? (y/n) > ')
-            if quit.lower() == 'n':
-                break
-
-    print("File 'import.txt' written to current directory.")
-
 def do_spanish():
     print('Doing Spanish')
 
+
 def do_french():
-    from category import Category
-    choice = {'1': 'Présent',
-              '2': 'Imparfait',
-              '3': 'Passé simple',
-              '4': 'Futur',
-              '5': 'Conditionnel'}
+    tense_choice =\
+        {'1': 'Présent',
+         '2': 'Imparfait',
+         '3': 'Passé simple',
+         '4': 'Futur',
+         '5': 'Conditionnel'}
+
     while (True):
             infinitive = input('Infinitive? > ')
-            tense = choice[input('1) Présent 2) Imparfait 3) Passé simple\n'
-                                 '4) Futur 5) Conditionnel > ')]
+            tense =\
+                tense_choice[input('1) Présent 2) Imparfait 3) Passé simple\n'
+                                   '4) Futur 5) Conditionnel\n'
+                                   '> ')]
 
             conj = French.construct_inflection(infinitive, tense)
 
-            print('\n'.join(French.output_normal_view(infinitive, tense, conj)))
+            output =\
+                input('1) Print to screen\n'
+                      '2) Print basic cloze deletion Anki format to file\n'
+                      '3) print cloze deletion format with translation and sound to file\n'
+                      '> ')
+
+            if output == '1':
+                print('\n'.join(French.output_normal_view(infinitive, tense, conj)))
+            elif output == '2':
+                with open('cloze.txt', 'w') as f:
+                    output = French.output_cloze(infinitive, tense, conj)
+                    f.write('\n'.join(output))
+
+                print("File 'cloze.txt' written to current directory.")
+
+            elif output == '3':      # TODO: add support for user-supplied translation and sound files
+                with open('cloze_extra.txt', 'w') as f:
+                    output = French.output_cloze_import(infinitive, tense,
+                                                        [], [], conj)
+                    f.write('\n'.join(output))
+                print("File 'cloze_extra.txt' written to current directory")
 
             quit = input('Continue? (y/n) > ')
             if quit.lower() == 'n':
