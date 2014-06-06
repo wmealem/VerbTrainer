@@ -8,6 +8,7 @@ _PRONOUNS = SpanishCategory('yo', 'tú', 'vos', 'él/ella/usted',
                            'nosotros/nosotras', 'vosotros/vosotras',
                            'ellos/ellas/ustedes')
 
+_STD_FORMAT = '{} {}'
 # Endings for the simple tenses
 _ENDINGS =\
     {'ar':
@@ -56,3 +57,13 @@ def construct_stem_and_ending(infinitive, tense):
     verb_type = infinitive[-2:]
     endings = _ENDINGS[verb_type][tense]
     return SpanishCategory._make([stem + end for end in endings])
+
+
+def construct_inflection(infinitive, tense):
+    '''
+    Given an infinitive and tense, constructs the combined
+    stem and ending, and then prepends the appropriate pronoun
+    '''
+    stem_and_ending = construct_stem_and_ending(infinitive, tense)
+    return SpanishCategory._make([item for item in zip(_PRONOUNS,
+                                                       stem_and_ending)])
