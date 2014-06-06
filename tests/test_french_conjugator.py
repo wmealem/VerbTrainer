@@ -162,6 +162,7 @@ class TestClozeDeletionOutputRules(unittest.TestCase):
             self.assertEqual(expected.spp, actual.spp)
             self.assertEqual(expected.tpp, actual.tpp)
 
+class TestOutputViews(unittest.TestCase):
     def test_normal_view(self):
         expected =\
 ['parler, Présent:',
