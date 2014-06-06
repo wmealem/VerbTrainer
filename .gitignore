@@ -2,3 +2,5 @@
 __pycache__/
 resources/
 *.gz
+cloze.txt
+cloze_extra.txt
