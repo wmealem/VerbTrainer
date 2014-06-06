@@ -105,7 +105,8 @@ class TestClozeDeletionOutputRules(unittest.TestCase):
                     'vous {{c1::parlez::parler, Présent}}',
                     'ils/elles {{c1::parlent::parler, Présent}}'])
 
-        actual = French.output_cloze('parler', 'Présent')
+        conj = French.construct_inflection('parler', 'Présent')
+        actual = French.output_cloze('parler', 'Présent', conj)
         with self.subTest():
             self.assertEqual(expected.fps, actual.fps)
             self.assertEqual(expected.sps, actual.sps)
@@ -123,7 +124,8 @@ class TestClozeDeletionOutputRules(unittest.TestCase):
                             'nous {{c1::abandonnons::abandonner, Présent}}',
                             'vous {{c1::abandonnez::abandonner, Présent}}',
                             'ils/elles {{c1::abandonnent::abandonner, Présent}}'])
-        actual = French.output_cloze('abandonner', 'Présent')
+        conj = French.construct_inflection('abandonner', 'Présent')
+        actual = French.output_cloze('abandonner', 'Présent', conj)
         with self.subTest():
             self.assertEqual(expected.fps, actual.fps)
             self.assertEqual(expected.sps, actual.sps)
@@ -146,9 +148,11 @@ class TestClozeDeletionOutputRules(unittest.TestCase):
         sound = ['je parle.mp3', 'tu parles.mp3', 'il parle.mp3',
                  'nous parlons.mp3', 'vous parlez.mp3', 'ils parlent.mp3']
 
+        conj = French.construct_inflection('parler', 'Présent')
         actual = French.output_cloze_import('parler', 'Présent',
                                             translation,
-                                            sound)
+                                            sound,
+                                            conj)
 
         with self.subTest():
             self.assertEqual(expected.fps, actual.fps)
@@ -173,5 +177,6 @@ class TestClozeDeletionOutputRules(unittest.TestCase):
             self.assertEqual(expected, actual)
 
         self.assertEqual
+
 if __name__ == '__main__':
     unittest.main()

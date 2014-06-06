@@ -129,13 +129,12 @@ def output_normal_view(infinitive, tense, conj):
                         '{} {}'. format(*conj.tpp))]
 
 
-def output_cloze(infinitive, tense):
+def output_cloze(infinitive, tense, conj):
     '''
     Combines the different parts of a verb conjugation with
     Anki's required formatting to produce a form suitable
     for a cloze-deletion card
     '''
-    conj = construct_inflection(infinitive, tense)
     result = []
     # TODO - make this pythonic, it's an ugly hack as it is
     for i, item in enumerate(conj):
@@ -148,13 +147,13 @@ def output_cloze(infinitive, tense):
     return Category._make(result)
 
 
-def output_cloze_import(infinitive, tense, translation, sound):
+def output_cloze_import(infinitive, tense, translation, sound, conj):
     '''
     Combines the output of the output_cloze function with optional
     translation and sound fields and combines them to produce the
     format required for Anki's import function
     '''
-    cloze = output_cloze(infinitive, tense)
+    cloze = output_cloze(infinitive, tense, conj)
     if translation:
         add_trn = [cz + ('|{}'.format(trn)) for cz, trn in
                    zip(cloze, translation)]
