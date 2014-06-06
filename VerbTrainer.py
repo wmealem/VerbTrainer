@@ -77,10 +77,8 @@ def do_french():
                                  '4) Futur 5) Conditionnel > ')]
 
             conj = French.construct_inflection(infinitive, tense)
-            result = Category._make([func(c) for func, c in\
-                                     zip(French.pronoun_rules, conj)])
 
-            French.print_normal_view(infinitive, tense, result)
+            print('\n'.join(French.output_normal_view(infinitive, tense, conj)))
 
             quit = input('Continue? (y/n) > ')
             if quit.lower() == 'n':
