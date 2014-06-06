@@ -20,6 +20,34 @@ class TestSpanishConjugator(unittest.TestCase):
 
         self.run_sub_tests(expected, 'presente')
 
+    def test_present_with_pronouns(self):
+        expected = [['yo hablo',
+                     'tú hablas', 'vos hablás',
+                     'él/ella/usted habla',
+                     'nosotros/nosotras hablamos',
+                     'vosotros/vosotras habláis',
+                     'ellos/ellas/ustedes hablan'],
+
+                    ['yo vendo',
+                     'tú vendes', 'vos vendés',
+                     'él/ella/usted vende',
+                     'nosotros/nosotras vendemos',
+                     'vosotros/vosotras vendéis',
+                     'ellos/ellas/ustedes venden'],
+
+                    ['yo vivo',
+                     'tú vives', 'vos vivís',
+                     'él/ella/usted vive',
+                     'nosotros/nosotras vivimos',
+                     'vosotros/vosotras vivís',
+                     'ellos/ellas/ustedes viven']]
+
+        with self.subTest():
+            for i, verb in enumerate(TestSpanishConjugator.test_verbs):
+                conj = Spanish.construct_inflection(verb, 'presente')
+                actual = [Spanish._STD_FORMAT.format(*item) for item in conj]
+                self.assertEqual(expected[i], actual)
+
     def test_imperfect(self):
         expected = [['hablaba', 'hablabas', 'hablabas', 'hablaba',
                      'hablábamos', 'hablabais', 'hablaban'],
