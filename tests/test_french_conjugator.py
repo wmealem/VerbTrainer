@@ -92,7 +92,7 @@ class TestFrenchConjugator(unittest.TestCase):
 class TestConjugatorVerbsThatStartWithVowel(unittest.TestCase):
     def test_verb_starts_with_a(self):
         conj = French.construct_inflection('abandonner', 'Présent').fps
-        pronoun, verb = conj[0], conj[1]
+        pronoun, verb = conj
         self.assertEqual("j'abandonne", '{0}{1}'.format(pronoun, verb))
 
 class TestClozeDeletionOutputRules(unittest.TestCase):
