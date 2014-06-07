@@ -27,8 +27,48 @@ def main():
 
 
 def do_spanish():
-    print('Doing Spanish')
+    tense_choice =\
+        {'1': 'presente',
+         '2': 'pretérito imperfecto',
+         '3': 'futuro simple',
+         '4': 'pretérito indefinido'}
 
+    while (True):
+        infinitive = input('Infinitive? > ')
+        tense =\
+            tense_choice[input('1) presente\n'
+                               '2) pretérito imperfecto\n'
+                               '3) futuro simple\n'
+                               '4) pretérito indefinado\n'
+                               '5) Conditionnel\n'
+                               '> ')]
+
+        conj = Spanish.construct_inflection(infinitive, tense)
+
+        output =\
+            input('1) Print to screen\n'
+                  '2) Print basic cloze deletion Anki format to file\n'
+                  '3) print cloze deletion format with translation and sound to file\n'
+                  '> ')
+        if output == '1':
+            print('\n'.join(Spanish.output_normal_view(infinitive, tense, conj)))
+        elif output == '2':
+            with open('cloze.txt', 'w') as f:
+                output = Spanish.output_cloze(infinitive, tense, conj)
+                f.write('\n'.join(output))
+
+            print("File 'cloze.txt' written to current directory.")
+
+        elif output == '3':      # TODO: add support for user-supplied translation and sound files
+            with open('cloze_extra.txt', 'w') as f:
+                output = Spanish.output_cloze_import(infinitive, tense,
+                                                    [], [], conj)
+                f.write('\n'.join(output))
+            print("File 'cloze_extra.txt' written to current directory")
+
+        quit = input('Continue? (y/n) > ')
+        if quit.lower() == 'n':
+            break
 
 def do_french():
     tense_choice =\
