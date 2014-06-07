@@ -1,6 +1,8 @@
 *.pyc
 __pycache__/
-resources/
+resources/sound
+resources/japanese
+resources/german
 *.gz
 cloze.txt
 cloze_extra.txt
