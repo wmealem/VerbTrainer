@@ -1,5 +1,5 @@
 # Spanish verb conjugations
-from collections import namedtuple
+from collections import namedtuple, OrderedDict
 
 # Spanish has two forms of the sps familiar - 'tú' and 'vos'
 SpanishCategory = namedtuple('SpanishCategory', 'fps sps spsv tps fpp spp tpp')
@@ -83,8 +83,11 @@ _STEM_RULES =\
 }
 
 
-def construct_tense_menu(how_many):
-    pass
+def construct_tense_menu(how_many=None):
+    if not how_many:
+        how_many = len(_TENSES)
+    num = [str(i) for i in range(1, how_many+1)]
+    return OrderedDict(zip(num, _TENSES))
 
 
 def construct_stem_and_ending(infinitive, tense):
@@ -102,6 +105,10 @@ def construct_stem_and_ending(infinitive, tense):
 
 
 def _construct_past_participle(infinitive):
+    '''
+    Given an infinitive, returns the past participle for
+    the given verb
+    '''
     ending = infinitive[-2:]
     stem = infinitive[:-2]
     if ending == 'ar':
