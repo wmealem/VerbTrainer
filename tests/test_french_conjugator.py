@@ -19,7 +19,7 @@ class TestFrenchConjugator(unittest.TestCase):
                     ['vends', 'vends', 'vend',
                      'vendons', 'vendez', 'vendent']]
 
-        self.run_sub_tests(expected, 'Présent')
+        self.run_sub_tests(expected, 'présent')
 
     def test_imperfect(self):
         expected = [['parlais', 'parlais', 'parlait',
@@ -29,7 +29,7 @@ class TestFrenchConjugator(unittest.TestCase):
                     ['vendais', 'vendais', 'vendait',
                      'vendions', 'vendiez', 'vendaient']]
 
-        self.run_sub_tests(expected, 'Imparfait')
+        self.run_sub_tests(expected, 'imparfait')
 
     def test_passé_simple(self):
         expected = [['parlai', 'parlas', 'parla',
@@ -39,7 +39,7 @@ class TestFrenchConjugator(unittest.TestCase):
                     ['vendis', 'vendis', 'vendit',
                      'vendîmes', 'vendîtes', 'vendirent']]
 
-        self.run_sub_tests(expected, 'Passé simple')
+        self.run_sub_tests(expected, 'passé simple')
 
     def test_future(self):
         expected = [['parlerai', 'parleras', 'parlera',
@@ -49,7 +49,7 @@ class TestFrenchConjugator(unittest.TestCase):
                     ['vendrai', 'vendras', 'vendra',
                      'vendrons', 'vendrez', 'vendront']]
 
-        self.run_sub_tests(expected, 'Futur')
+        self.run_sub_tests(expected, 'futur')
 
     def test_conditional(self):
         expected = [['parlerais', 'parlerais', 'parlerait',
@@ -59,7 +59,7 @@ class TestFrenchConjugator(unittest.TestCase):
                     ['vendrais', 'vendrais', 'vendrait',
                      'vendrions', 'vendriez', 'vendraient']]
 
-        self.run_sub_tests(expected, 'Conditionnel')
+        self.run_sub_tests(expected, 'conditionnel')
 
     def test_present_subjunctive(self):
         expected = [['parle', 'parles', 'parle',
@@ -69,7 +69,7 @@ class TestFrenchConjugator(unittest.TestCase):
                     ['vende', 'vendes', 'vende',
                      'vendions', 'vendiez', 'vendent']]
 
-        self.run_sub_tests(expected, 'Présent subjonctif')
+        self.run_sub_tests(expected, 'présent subjonctif')
 
     def test_imperfect_subjunctive(self):
         expected = [['parlasse', 'parlasses', 'parlât',
@@ -79,7 +79,7 @@ class TestFrenchConjugator(unittest.TestCase):
                     ['vendisse', 'vendisses', 'vendît',
                      'vendissions', 'vendissiez', 'vendissent']]
 
-        self.run_sub_tests(expected, 'Imparfait subjonctif')
+        self.run_sub_tests(expected, 'imparfait subjonctif')
 
     def run_sub_tests(self, expected, tense):
         conj = partial(French.construct_stem_and_ending, tense=tense)
@@ -91,22 +91,22 @@ class TestFrenchConjugator(unittest.TestCase):
 
 class TestConjugatorVerbsThatStartWithVowel(unittest.TestCase):
     def test_verb_starts_with_a(self):
-        conj = French.construct_inflection('abandonner', 'Présent').fps
+        conj = French.construct_inflection('abandonner', 'présent').fps
         pronoun, verb = conj
         self.assertEqual("j'abandonne", '{0}{1}'.format(pronoun, verb))
 
 class TestClozeDeletionOutputRules(unittest.TestCase):
 
     def test_cloze_normal(self):
-        expected = Category._make(['je {{c1::parle::parler, Présent}}',
-                    'tu {{c1::parles::parler, Présent}}',
-                    'il/elle/on {{c1::parle::parler, Présent}}',
-                    'nous {{c1::parlons::parler, Présent}}',
-                    'vous {{c1::parlez::parler, Présent}}',
-                    'ils/elles {{c1::parlent::parler, Présent}}'])
+        expected = Category._make(['je {{c1::parle::parler, présent}}',
+                    'tu {{c1::parles::parler, présent}}',
+                    'il/elle/on {{c1::parle::parler, présent}}',
+                    'nous {{c1::parlons::parler, présent}}',
+                    'vous {{c1::parlez::parler, présent}}',
+                    'ils/elles {{c1::parlent::parler, présent}}'])
 
-        conj = French.construct_inflection('parler', 'Présent')
-        actual = French.output_cloze('parler', 'Présent', conj)
+        conj = French.construct_inflection('parler', 'présent')
+        actual = French.output_cloze('parler', 'présent', conj)
         with self.subTest():
             self.assertEqual(expected.fps, actual.fps)
             self.assertEqual(expected.sps, actual.sps)
@@ -118,14 +118,14 @@ class TestClozeDeletionOutputRules(unittest.TestCase):
 
     def test_cloze_verb_begins_with_vowel(self):
         expected =\
-            Category._make(["j'{{c1::abandonne::abandonner, Présent}}",
-                            'tu {{c1::abandonnes::abandonner, Présent}}',
-                            'il/elle/on {{c1::abandonne::abandonner, Présent}}',
-                            'nous {{c1::abandonnons::abandonner, Présent}}',
-                            'vous {{c1::abandonnez::abandonner, Présent}}',
-                            'ils/elles {{c1::abandonnent::abandonner, Présent}}'])
-        conj = French.construct_inflection('abandonner', 'Présent')
-        actual = French.output_cloze('abandonner', 'Présent', conj)
+            Category._make(["j'{{c1::abandonne::abandonner, présent}}",
+                            'tu {{c1::abandonnes::abandonner, présent}}',
+                            'il/elle/on {{c1::abandonne::abandonner, présent}}',
+                            'nous {{c1::abandonnons::abandonner, présent}}',
+                            'vous {{c1::abandonnez::abandonner, présent}}',
+                            'ils/elles {{c1::abandonnent::abandonner, présent}}'])
+        conj = French.construct_inflection('abandonner', 'présent')
+        actual = French.output_cloze('abandonner', 'présent', conj)
         with self.subTest():
             self.assertEqual(expected.fps, actual.fps)
             self.assertEqual(expected.sps, actual.sps)
@@ -135,12 +135,12 @@ class TestClozeDeletionOutputRules(unittest.TestCase):
             self.assertEqual(expected.tpp, actual.tpp)
 
     def test_cloze_import(self):
-        expected = Category._make(['je {{c1::parle::parler, Présent}}|I speak|[sound:je parle.mp3]|parler',
-                    'tu {{c1::parles::parler, Présent}}|you speak|[sound:tu parles.mp3]|parler',
-                    'il/elle/on {{c1::parle::parler, Présent}}|he/she/it speaks|[sound:il parle.mp3]|parler',
-                    'nous {{c1::parlons::parler, Présent}}|we speak|[sound:nous parlons.mp3]|parler',
-                    'vous {{c1::parlez::parler, Présent}}|you speak|[sound:vous parlez.mp3]|parler',
-                    'ils/elles {{c1::parlent::parler, Présent}}|they speak|[sound:ils parlent.mp3]|parler'])
+        expected = Category._make(['je {{c1::parle::parler, présent}}|I speak|[sound:je parle.mp3]|parler',
+                    'tu {{c1::parles::parler, présent}}|you speak|[sound:tu parles.mp3]|parler',
+                    'il/elle/on {{c1::parle::parler, présent}}|he/she/it speaks|[sound:il parle.mp3]|parler',
+                    'nous {{c1::parlons::parler, présent}}|we speak|[sound:nous parlons.mp3]|parler',
+                    'vous {{c1::parlez::parler, présent}}|you speak|[sound:vous parlez.mp3]|parler',
+                    'ils/elles {{c1::parlent::parler, présent}}|they speak|[sound:ils parlent.mp3]|parler'])
 
         translation = ['I speak', 'you speak', 'he/she/it speaks',
                        'we speak', 'you speak', 'they speak']
@@ -148,8 +148,8 @@ class TestClozeDeletionOutputRules(unittest.TestCase):
         sound = ['je parle.mp3', 'tu parles.mp3', 'il parle.mp3',
                  'nous parlons.mp3', 'vous parlez.mp3', 'ils parlent.mp3']
 
-        conj = French.construct_inflection('parler', 'Présent')
-        actual = French.output_cloze_import('parler', 'Présent',
+        conj = French.construct_inflection('parler', 'présent')
+        actual = French.output_cloze_import('parler', 'présent',
                                             translation,
                                             sound,
                                             conj)
@@ -165,28 +165,28 @@ class TestClozeDeletionOutputRules(unittest.TestCase):
 class TestOutputViews(unittest.TestCase):
     def test_normal_view(self):
         expected =\
-['parler, Présent:',
+['parler, présent:',
 '⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯',
 'je parle                 ‖ nous parlons',
 'tu parles                ‖ vous parlez',
 'il/elle/on parle         ‖ ils/elles parlent'
 ]
 
-        conj = French.construct_inflection('parler', 'Présent')
-        actual = French.output_normal_view('parler', 'Présent', conj)
+        conj = French.construct_inflection('parler', 'présent')
+        actual = French.output_normal_view('parler', 'présent', conj)
         self.assertEqual(expected, actual)
 
     def test_normal_view(self):
         expected =\
-['abandonner, Présent:',
+['abandonner, présent:',
 '⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯',
 "j'abandonne              ‖ nous abandonnons",
 'tu abandonnes            ‖ vous abandonnez',
 'il/elle/on abandonne     ‖ ils/elles abandonnent'
 ]
 
-        conj = French.construct_inflection('abandonner', 'Présent')
-        actual = French.output_normal_view('abandonner', 'Présent', conj)
+        conj = French.construct_inflection('abandonner', 'présent')
+        actual = French.output_normal_view('abandonner', 'présent', conj)
         self.assertEqual(expected, actual)
 
 if __name__ == '__main__':
