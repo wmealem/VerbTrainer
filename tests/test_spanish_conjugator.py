@@ -85,3 +85,13 @@ class TestSpanishConjugator(unittest.TestCase):
             with self.subTest(verb=verb, tense=tense):
                 [self.assertEqual(expect, actual) for expect, actual in
                  zip(expected[i], conj(verb))]
+
+    def test_present_perfect(self):
+        expected = [['he hablado', 'has hablado', 'has hablado', 'ha hablado',
+                     'hemos hablado', 'habéis hablado', 'han hablado'],
+                    ['he vendido', 'has vendido', 'has vendido', 'ha vendido',
+                     'hemos vendido', 'habéis vendido', 'han vendido'],
+                    ['he vivido', 'has vivido', 'has vivido', 'ha vivido',
+                     'hemos vivido', 'habéis vivido', 'han vivido']]
+
+        self.run_sub_tests(expected, 'pretérito perfecto')

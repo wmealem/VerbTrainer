@@ -9,7 +9,36 @@ _PRONOUNS = SpanishCategory('yo', 'tú', 'vos', 'él/ella/usted',
                            'ellos/ellas/ustedes')
 
 _STD_FORMAT = '{} {}'
+
 _STD_CLOZE_FORMAT = '{0} {{{{c1::{1}::{2}, {3}}}}}'
+
+_TENSES =\
+         [# tiempos simples
+          'presente',
+          'pretérito imperfecto',
+          'pretérito indefinido',
+          'futuro simple',
+          # tiempos compuestos
+          'pretérito perfecto',
+          'pretérito pluscuamperfecto',
+          'pretérito anterior',
+          'futuro compuesto',
+          # condicional
+          'condicional simple',
+          'condicional compuesto',
+          # imperativo
+          'imperativo positivo',
+          'imperativo negativo',
+          # subjuntivo - tiempos simples
+          'presente de subjuntivo',
+          'imperfecto de subjuntivo(-ra)',
+          'imperfecto de subjuntivo(-se)'
+          'futuro simple de subjuntivo',
+          # subjuntivo - timepos compuestos
+          'pretérito perfecto de subjuntivo',
+          'pluscuamperfecto de subjuntivo',
+          'futuro compuesto de subjuntivo'
+        ]
 
 # Endings for the simple tenses
 _ENDINGS =\
@@ -54,11 +83,33 @@ _STEM_RULES =\
 }
 
 
+def construct_tense_menu(how_many):
+    pass
+
+
 def construct_stem_and_ending(infinitive, tense):
-    stem = _STEM_RULES[tense](infinitive)
-    verb_type = infinitive[-2:]
-    endings = _ENDINGS[verb_type][tense]
-    return SpanishCategory._make([stem + end for end in endings])
+    if tense in ['pretérito perfecto']:
+        past_participle = _construct_past_participle(infinitive)
+        inflection = ['{} {}'.format(aux, past_participle)
+                      for aux in AUX_VERB['haber']['presente']]
+    else:
+        stem = _STEM_RULES[tense](infinitive)
+        verb_type = infinitive[-2:]
+        endings = _ENDINGS[verb_type][tense]
+        inflection = [stem + end for end in endings]
+
+    return SpanishCategory._make(inflection)
+
+
+def _construct_past_participle(infinitive):
+    ending = infinitive[-2:]
+    stem = infinitive[:-2]
+    if ending == 'ar':
+        return stem + 'ado'
+    elif ending == 'er':
+        return stem + 'ido'
+    elif ending == 'ir':
+        return stem + 'ido'
 
 
 def construct_inflection(infinitive, tense):
@@ -69,6 +120,8 @@ def construct_inflection(infinitive, tense):
     stem_and_ending = construct_stem_and_ending(infinitive, tense)
     return SpanishCategory._make([item for item in zip(_PRONOUNS,
                                                        stem_and_ending)])
+
+
 def output_normal_view(infinitive, tense, conj):
     '''
     Pretty-printing for the traditional two-column output
@@ -92,8 +145,8 @@ def output_cloze(infinitive, tense, conj):
     result = []
     # TODO - make this pythonic, it's an ugly hack as it is
     for i, item in enumerate(conj):
-       result.append(_STD_CLOZE_FORMAT.format(item[0], item[1],
-                                             infinitive, tense))
+        result.append(_STD_CLOZE_FORMAT.format(item[0], item[1],
+                                               infinitive, tense))
     return SpanishCategory._make(result)
 
 
@@ -119,3 +172,29 @@ def output_cloze_import(infinitive, tense, translation, sound, conj):
     add_tag = [snd + ('|{}'.format(infinitive)) for snd in add_snd]
 
     return SpanishCategory._make(add_tag)
+
+AUX_VERB = {'haber':
+            {'presente':
+             SpanishCategory._make(['he', 'has', 'has', 'ha',
+                                    'hemos', 'habéis', 'han']),
+             'pretérito imperfecto':
+             SpanishCategory._make(['habíá', 'habías', 'habías', 'había',
+                                    'habíamos', 'habíaís', 'habían']),
+             'pretérito indefinido':
+             SpanishCategory._make(['hube', 'hubiste(s)', 'hubiste(s)', 'hubo',
+                                    'hubimos', 'hubisteis', 'hubieron']),
+             'futuro simple':
+             SpanishCategory._make(['habré', 'habrás', 'habrás', 'habrá',
+                                    'habremos', 'habréis', 'habrán']),
+             'condicional simple':
+             SpanishCategory._make(['habría', 'habrías', 'habrías', 'habría',
+                                    'habríamos', 'habríais', 'habrían']),
+             'presente de subjuntivo':
+             SpanishCategory._make(['haya', 'hayas', 'hayas', 'haya',
+                                    'hayamos', 'hayáis', 'hayan']),
+             'imperfecto de subjuntivo(-ra)':
+             SpanishCategory._make(['hubiera', 'hubieras', 'hubieras', 'hubiera',
+                                    'hubiéramos', 'hubierais', 'hubieran']),
+             'imperfecto de subjuntivo(-se)':
+             SpanishCategory._make(['hubiese', 'hubieses', 'hubieses', 'hubiese',
+                                    'hubiésemos', 'hubieseis', 'hubiesen'])}}
