@@ -2,87 +2,48 @@ import languages.french as French
 import languages.spanish as Spanish
 from collections import OrderedDict
 
+
 def main():
 
     print("Welcome to Verb Trainer!")
-
-    language_choice = {'1': 'Spanish',
-                       '2': 'French'
-                       }
-
-    task_choice = {'1': conjugate_verb,
-                   '2': goodbye}
-
-    language = language_choice[input('Choose a language: 1) castellano 2) français\n'
-                                     "Type '1' or '2', then press 'Enter' > ")]
+    language = get_language_choice()
 
     while True:
-
-        task = task_choice[input('What would you like to do?\n'
-                                 '1) conjugate a verb\n'
-                                 '2) Quit\n'
-                                 "Type '1' or '2' then press 'Enter' > ")]
-
-        task(language)
-
-
-def do_spanish():
-    tense_choice = construct_tense_menu(Spanish._TENSES, 5)
-    menu = '\n'.join(['{}) {}'.format(*item) for item in tense_choice.items()])
-
-    while (True):
-        infinitive = get_infinitive()
-        tense = tense_choice[input('Tense?\n' + menu + '\n> ')]
-
-        conj = Spanish.construct_inflection(infinitive, tense)
-
-        output = output_menu()
-        if output == '1':
-            print('\n'.join(Spanish.output_normal_view(infinitive, tense, conj)))
-        elif output == '2':
-            with open('cloze.txt', 'w') as f:
-                output = Spanish.output_cloze(infinitive, tense, conj)
-                f.write('\n'.join(output))
-
-            print("File 'cloze.txt' written to current directory.")
-
-        elif output == '3':      # TODO: add support for user-supplied translation and sound files
-            with open('cloze_extra.txt', 'w') as f:
-                output = Spanish.output_cloze_import(infinitive, tense,
-                                                    [], [], conj)
-                f.write('\n'.join(output))
-            print("File 'cloze_extra.txt' written to current directory")
-
-        quit = input('Continue? (y/n) > ')
-        if quit.lower() == 'n':
+        task_choice = get_task_choice()
+        if task_choice == '1':
+            conjugate_verb(language)
+        else:
             break
 
+    goodbye(language)
 
-def do_french():
-    tense_choice = construct_tense_menu(French._TENSES, 5)
+def conjugate_verb(language):
+    tenses, conjugator, view, cloze, export = get_language_tools(language)
+
+    tense_choice = construct_tense_menu(tenses, 5)
+
     menu = '\n'.join(['{}) {}'.format(*item) for item in tense_choice.items()])
 
     while (True):
             infinitive = get_infinitive()
             tense = tense_choice[input('Tense?\n' + menu + '\n> ')]
 
-            conj = French.construct_inflection(infinitive, tense)
+            conj = conjugator(infinitive, tense)
 
             output = output_menu()
 
             if output == '1':
-                print('\n'.join(French.output_normal_view(infinitive, tense, conj)))
+                print('\n'.join(view(infinitive, tense, conj)))
             elif output == '2':
                 with open('cloze.txt', 'w') as f:
-                    output = French.output_cloze(infinitive, tense, conj)
+                    output = cloze(infinitive, tense, conj)
                     f.write('\n'.join(output))
 
                 print("File 'cloze.txt' written to current directory.")
 
             elif output == '3':      # TODO: add support for user-supplied translation and sound files
                 with open('cloze_extra.txt', 'w') as f:
-                    output = French.output_cloze_import(infinitive, tense,
-                                                        [], [], conj)
+                    output = export(infinitive, tense, [], [], conj)
                     f.write('\n'.join(output))
                 print("File 'cloze_extra.txt' written to current directory")
 
@@ -91,19 +52,23 @@ def do_french():
                 break
 
 
-def do_german():
-    raise NotImplementedError
+def get_language_tools(language):
+    if language == 'French':
+        tenses = French._TENSES
+        conjugator = French.construct_inflection
+        view = French.output_normal_view
+        cloze = French.output_cloze
+        export = French.output_cloze_import
+    elif language == 'Spanish':
+        tenses = Spanish._TENSES
+        conjugator = Spanish.construct_inflection
+        view = Spanish.output_normal_view
+        cloze = Spanish.output_cloze
+        export = Spanish.output_cloze_import
+    else:
+        raise NotImplementedError
 
-
-def do_japanese():
-    raise NotImplementedError
-
-
-def conjugate_verb(language):
-    do_something = {'Spanish': do_spanish,
-                    'French': do_french}
-
-    do_something[language]()
+    return tenses, conjugator, view, cloze, export
 
 
 def goodbye(language):
@@ -111,7 +76,6 @@ def goodbye(language):
            'French': 'Au revoir!'}
     print('Thanks for using Verb Trainer!')
     print(msg[language])
-    exit()
 
 
 def write_import():
@@ -130,8 +94,25 @@ def output_menu():
                  '> ')
 
 
+def get_task_choice():
+    return input('What would you like to do?\n'
+                 '1) conjugate a verb\n'
+                 '2) Quit\n'
+                 "Type '1' or '2' then press 'Enter' > ")
+
+
+def get_language_choice():
+    language_choice = {'1': 'Spanish',
+                       '2': 'French'
+                       }
+
+    return language_choice[input('Choose a language: 1) castellano 2) français\n'
+                                     "Type '1' or '2', then press 'Enter' > ")]
+
+
 def get_infinitive():
     return input('Infinitive? > ')
+
 
 def construct_tense_menu(tenses, how_many=None):
     if not how_many:
