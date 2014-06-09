@@ -21,6 +21,7 @@ _STD_FORMAT = '{} {}'
 _FPS_CLOZE_FORMAT = '{0}{{{{c1::{1}::{2}, {3}}}}}'
 _STD_CLOZE_FORMAT = '{0} {{{{c1::{1}::{2}, {3}}}}}'
 
+
 _VOWELS = ('a', 'e', 'i', 'o', 'u')
 
 
@@ -28,7 +29,7 @@ def imparfait(infinitive):
     '''
     Creates the appropriate stem from the présent case
     '''
-    stem = construct_stem_and_ending(infinitive, 'Présent').fpp
+    stem = construct_stem_and_ending(infinitive, 'présent').fpp
     return stem.rsplit('ons')[0]
 
 
@@ -36,50 +37,71 @@ def présent_subjonctif(infinitive):
     '''
     Creates the appropriate stem from the présent case
     '''
-    stem = construct_stem_and_ending(infinitive, 'Présent').tpp
+    stem = construct_stem_and_ending(infinitive, 'présent').tpp
     return stem.rsplit('ent')[0]
+
+
+_TENSES =\
+          [# simple tenses
+              'présent',
+              'passé simple',
+              'imparfait',
+              'futur',
+              'conditionnel'
+              'subjonctif présent',
+              'subjonctif imparfait',
+           # compound tenses
+              'passé composé',
+              'plus-que-parfait',
+              'futur antérieur',
+              'passé antérieur',
+              'subjonctif passé',
+              'subjonctif plus-que-parfait',
+              'passé du conditionnel'
+          ]
+
 
 # Logic for handling the different stem changes of regular verbs
 _STEM_RULES =\
-{'Présent': (lambda x: x[:-2]),
- 'Futur': (lambda x: x[:-1] if x[-2:] == 're' else x),
- 'Imparfait': imparfait,
- 'Passé simple': (lambda x: x[:-2]),
- 'Conditionnel': (lambda x: x[:-1] if x[-2:] == 're' else x),
- 'Présent subjonctif': présent_subjonctif,
- 'Imparfait subjonctif': (lambda x: x[:-2])}
+{'présent': (lambda x: x[:-2]),
+ 'futur': (lambda x: x[:-1] if x[-2:] == 're' else x),
+ 'imparfait': imparfait,
+ 'passé simple': (lambda x: x[:-2]),
+ 'conditionnel': (lambda x: x[:-1] if x[-2:] == 're' else x),
+ 'présent subjonctif': présent_subjonctif,
+ 'imparfait subjonctif': (lambda x: x[:-2])}
 
 # Simple Tense endings
 # TODO: add the compound tenses and handle stem- and spelling-change
 # verbs
 _ENDINGS =\
     {'er':
-     {'Présent': Category('e', 'es', 'e', 'ons', 'ez', 'ent'),
-      'Imparfait': Category('ais', 'ais', 'ait', 'ions', 'iez', 'aient'),
-      'Passé simple': Category('ai', 'as', 'a', 'âmes', 'âtes', 'èrent'),
-      'Futur': Category('ai', 'as', 'a', 'ons', 'ez', 'ont'),
-      'Conditionnel': Category('ais', 'ais', 'ait', 'ions', 'iez', 'aient'),
-      'Présent subjonctif': Category('e', 'es', 'e', 'ions', 'iez', 'ent'),
-      'Imparfait subjonctif': Category('asse', 'asses', 'ât',
+     {'présent': Category('e', 'es', 'e', 'ons', 'ez', 'ent'),
+      'imparfait': Category('ais', 'ais', 'ait', 'ions', 'iez', 'aient'),
+      'passé simple': Category('ai', 'as', 'a', 'âmes', 'âtes', 'èrent'),
+      'futur': Category('ai', 'as', 'a', 'ons', 'ez', 'ont'),
+      'conditionnel': Category('ais', 'ais', 'ait', 'ions', 'iez', 'aient'),
+      'présent subjonctif': Category('e', 'es', 'e', 'ions', 'iez', 'ent'),
+      'imparfait subjonctif': Category('asse', 'asses', 'ât',
                                        'assions', 'assiez', 'assent')},
      'ir':
-     {'Présent': Category('is', 'is', 'it', 'issons', 'issez', 'issent'),
-      'Imparfait': Category('ais', 'ais', 'ait', 'ions', 'iez', 'aient'),
-      'Passé simple': Category('is', 'is', 'it', 'îmes', 'îtes', 'irent'),
-      'Futur': Category('ai', 'as', 'a', 'ons', 'ez', 'ont'),
-      'Conditionnel': Category('ais', 'ais', 'ait', 'ions', 'iez', 'aient'),
-      'Présent subjonctif': Category('e', 'es', 'e', 'ions', 'iez', 'ent'),
-      'Imparfait subjonctif': Category('isse', 'isses', 'ît',
+     {'présent': Category('is', 'is', 'it', 'issons', 'issez', 'issent'),
+      'imparfait': Category('ais', 'ais', 'ait', 'ions', 'iez', 'aient'),
+      'passé simple': Category('is', 'is', 'it', 'îmes', 'îtes', 'irent'),
+      'futur': Category('ai', 'as', 'a', 'ons', 'ez', 'ont'),
+      'conditionnel': Category('ais', 'ais', 'ait', 'ions', 'iez', 'aient'),
+      'présent subjonctif': Category('e', 'es', 'e', 'ions', 'iez', 'ent'),
+      'imparfait subjonctif': Category('isse', 'isses', 'ît',
                                        'issions', 'issiez', 'issent')
   },
      're':
-     {'Présent': Category('s', 's', '', 'ons', 'ez', 'ent'),
-      'Imparfait': Category('ais', 'ais', 'ait', 'ions', 'iez', 'aient'),
-      'Passé simple': Category('is', 'is', 'it', 'îmes', 'îtes', 'irent'),
-      'Futur': Category('ai', 'as', 'a', 'ons', 'ez', 'ont'),
-      'Conditionnel': Category('ais', 'ais', 'ait', 'ions', 'iez', 'aient'),
-      'Présent subjonctif': Category('e', 'es', 'e', 'ions', 'iez', 'ent'),
-      'Imparfait subjonctif': Category('isse', 'isses', 'ît',
+     {'présent': Category('s', 's', '', 'ons', 'ez', 'ent'),
+      'imparfait': Category('ais', 'ais', 'ait', 'ions', 'iez', 'aient'),
+      'passé simple': Category('is', 'is', 'it', 'îmes', 'îtes', 'irent'),
+      'futur': Category('ai', 'as', 'a', 'ons', 'ez', 'ont'),
+      'conditionnel': Category('ais', 'ais', 'ait', 'ions', 'iez', 'aient'),
+      'présent subjonctif': Category('e', 'es', 'e', 'ions', 'iez', 'ent'),
+      'imparfait subjonctif': Category('isse', 'isses', 'ît',
                                        'issions', 'issiez', 'issent')
   }
 }
@@ -90,7 +112,7 @@ def imparfait_subjonctif(infinitive):
     Creates the appropriate stem from the passé simple case
     '''
 
-    stem = construct_inflection(infinitive, 'Passé simple').tps
+    stem = construct_inflection(infinitive, 'passé simple').tps
     return stem[:-1]
 
 
