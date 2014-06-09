@@ -30,8 +30,9 @@ def do_spanish():
     tense_choice =\
         {'1': 'presente',
          '2': 'pretérito imperfecto',
-         '3': 'futuro simple',
-         '4': 'pretérito indefinido'}
+         '3': 'pretérito indefinido',
+         '4': 'futuro simple',
+         '5': 'pretérito perfecto'}
 
     while (True):
         infinitive = input('Infinitive? > ')
@@ -40,7 +41,7 @@ def do_spanish():
                                '2) pretérito imperfecto\n'
                                '3) futuro simple\n'
                                '4) pretérito indefinado\n'
-                               '5) Conditionnel\n'
+                               '5) pretérito perfecto\n'
                                '> ')]
 
         conj = Spanish.construct_inflection(infinitive, tense)
