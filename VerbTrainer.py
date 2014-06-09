@@ -27,30 +27,16 @@ def main():
 
 
 def do_spanish():
-    tense_choice =\
-        {'1': 'presente',
-         '2': 'pretérito imperfecto',
-         '3': 'pretérito indefinido',
-         '4': 'futuro simple',
-         '5': 'pretérito perfecto'}
+    tense_choice = Spanish.construct_tense_menu(5)
+    menu = '\n'.join(['{}) {}'.format(*item) for item in tense_choice.items()])
 
     while (True):
-        infinitive = input('Infinitive? > ')
-        tense =\
-            tense_choice[input('1) presente\n'
-                               '2) pretérito imperfecto\n'
-                               '3) futuro simple\n'
-                               '4) pretérito indefinado\n'
-                               '5) pretérito perfecto\n'
-                               '> ')]
+        infinitive = get_infinitive()
+        tense = tense_choice[input('Tense?\n' + menu + '\n> ')]
 
         conj = Spanish.construct_inflection(infinitive, tense)
 
-        output =\
-            input('1) Print to screen\n'
-                  '2) Print basic cloze deletion Anki format to file\n'
-                  '3) print cloze deletion format with translation and sound to file\n'
-                  '> ')
+        output = output_menu()
         if output == '1':
             print('\n'.join(Spanish.output_normal_view(infinitive, tense, conj)))
         elif output == '2':
@@ -88,11 +74,7 @@ def do_french():
 
             conj = French.construct_inflection(infinitive, tense)
 
-            output =\
-                input('1) Print to screen\n'
-                      '2) Print basic cloze deletion Anki format to file\n'
-                      '3) print cloze deletion format with translation and sound to file\n'
-                      '> ')
+            output = output_menu()
 
             if output == '1':
                 print('\n'.join(French.output_normal_view(infinitive, tense, conj)))
@@ -114,17 +96,21 @@ def do_french():
             if quit.lower() == 'n':
                 break
 
+
 def do_german():
     raise NotImplementedError
 
+
 def do_japanese():
     raise NotImplementedError
+
 
 def conjugate_verb(language):
     do_something = {'Spanish': do_spanish,
                     'French': do_french}
 
     do_something[language]()
+
 
 def goodbye(language):
     msg = {'Spanish': 'Adiós',
@@ -133,12 +119,25 @@ def goodbye(language):
     print(msg[language])
     exit()
 
+
 def write_import():
     print('Writing import file...\n')
+
 
 def write_to_file(f, conj):
     out = conj + '\n'
     f.write(out)
+
+
+def output_menu():
+    return input('1) Print to screen\n'
+                 '2) Print basic cloze deletion Anki format to file\n'
+                 '3) print cloze deletion format with translation and sound to file\n'
+                 '> ')
+
+
+def get_infinitive():
+    return input('Infinitive? > ')
 
 
 if __name__ == "__main__":
