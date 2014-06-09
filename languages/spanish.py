@@ -83,13 +83,6 @@ _STEM_RULES =\
 }
 
 
-def construct_tense_menu(how_many=None):
-    if not how_many:
-        how_many = len(_TENSES)
-    num = [str(i) for i in range(1, how_many+1)]
-    return OrderedDict(zip(num, _TENSES))
-
-
 def construct_stem_and_ending(infinitive, tense):
     if tense in ['pretérito perfecto']:
         past_participle = _construct_past_participle(infinitive)
