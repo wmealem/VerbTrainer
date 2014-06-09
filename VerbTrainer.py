@@ -1,6 +1,6 @@
 import languages.french as French
 import languages.spanish as Spanish
-
+from collections import OrderedDict
 
 def main():
 
@@ -27,7 +27,7 @@ def main():
 
 
 def do_spanish():
-    tense_choice = Spanish.construct_tense_menu(5)
+    tense_choice = construct_tense_menu(Spanish._TENSES, 5)
     menu = '\n'.join(['{}) {}'.format(*item) for item in tense_choice.items()])
 
     while (True):
@@ -57,20 +57,14 @@ def do_spanish():
         if quit.lower() == 'n':
             break
 
+
 def do_french():
-    tense_choice =\
-        {'1': 'Présent',
-         '2': 'Imparfait',
-         '3': 'Passé simple',
-         '4': 'Futur',
-         '5': 'Conditionnel'}
+    tense_choice = construct_tense_menu(French._TENSES, 5)
+    menu = '\n'.join(['{}) {}'.format(*item) for item in tense_choice.items()])
 
     while (True):
-            infinitive = input('Infinitive? > ')
-            tense =\
-                tense_choice[input('1) Présent 2) Imparfait 3) Passé simple\n'
-                                   '4) Futur 5) Conditionnel\n'
-                                   '> ')]
+            infinitive = get_infinitive()
+            tense = tense_choice[input('Tense?\n' + menu + '\n> ')]
 
             conj = French.construct_inflection(infinitive, tense)
 
@@ -139,6 +133,11 @@ def output_menu():
 def get_infinitive():
     return input('Infinitive? > ')
 
+def construct_tense_menu(tenses, how_many=None):
+    if not how_many:
+        how_many = len(tenses)
+    num = [str(i) for i in range(1, how_many+1)]
+    return OrderedDict(zip(num, tenses))
 
 if __name__ == "__main__":
     main()
