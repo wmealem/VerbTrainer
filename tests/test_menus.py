@@ -1,12 +1,13 @@
 import unittest
+import VerbTrainer
 import languages.spanish as es
 import languages.french as fr
 
 
 class TestMenus(unittest.TestCase):
-    def test_spanish_tense_menu_one(self):
+    def test_tense_menu_one(self):
         expected = 'presente'
-        actual = es.construct_tense_menu(1)
+        actual = VerbTrainer.construct_tense_menu(es._TENSES,1)
         self.assertEqual(expected, actual['1'])
 
     def test_spanish_tense_menu_five(self):
@@ -15,10 +16,10 @@ class TestMenus(unittest.TestCase):
                     'pretérito indefinido',
                     'futuro simple',
                     'pretérito perfecto']
-        actual = es.construct_tense_menu(5)
+        actual = VerbTrainer.construct_tense_menu(es._TENSES, 5)
         self.assertEqual(expected, list(actual.values()))
 
     def test_spanish_tense_menu_all(self):
         expected = es._TENSES
-        actual = es.construct_tense_menu()
+        actual = VerbTrainer.construct_tense_menu(es._TENSES)
         self.assertEqual(expected, list(actual.values()))
