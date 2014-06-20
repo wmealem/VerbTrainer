@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import languages.french as French
 import languages.spanish as Spanish
 from collections import OrderedDict
@@ -20,7 +21,7 @@ def main():
 def conjugate_verb(language):
     tenses, conjugator, view, cloze, export = get_language_tools(language)
 
-    tense_choice = construct_tense_menu(tenses, 5)
+    tense_choice = construct_tense_menu(tenses, len(tenses))
 
     menu = '\n'.join(['{}) {}'.format(*item) for item in tense_choice.items()])
 
@@ -33,7 +34,7 @@ def conjugate_verb(language):
             output = output_menu()
 
             if output == '1':
-                print('\n'.join(view(infinitive, tense, conj)))
+                view(infinitive, tense, conj)
             elif output == '2':
                 with open('cloze.txt', 'w') as f:
                     output = cloze(infinitive, tense, conj)
