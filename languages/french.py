@@ -8,20 +8,18 @@ from category import Category
 # when the first letter of the verb is a vowel
 # TODO: handle the case of the unaspirated h
 
-_PRONOUNS = Category((lambda stem: "j'" if stem[0]
+_PRONOUNS = Category((lambda verb: "j'" if verb[0]
                       in _VOWELS else 'je'),
-                     (lambda stem: 'tu'),
-                     (lambda stem: 'il/elle/on'),
-                     (lambda stem: 'nous'),
-                     (lambda stem: 'vous'),
-                     (lambda stem: 'ils/elles'))
+                     (lambda verb: 'tu'),
+                     (lambda verb: 'il/elle/on'),
+                     (lambda verb: 'nous'),
+                     (lambda verb: 'vous'),
+                     (lambda verb: 'ils/elles'))
 
 _FPS_FORMAT = '{}{}'
 _STD_FORMAT = '{} {}'
 _FPS_CLOZE_FORMAT = '{0}{{{{c1::{1}::{2}, {3}}}}}'
 _STD_CLOZE_FORMAT = '{0} {{{{c1::{1}::{2}, {3}}}}}'
-
-
 _VOWELS = ('a', 'e', 'i', 'o', 'u')
 
 
@@ -47,7 +45,7 @@ _TENSES =\
               'passé simple',
               'imparfait',
               'futur',
-              'conditionnel'
+              'conditionnel',
               'subjonctif présent',
               'subjonctif imparfait',
            # compound tenses
@@ -68,11 +66,11 @@ _STEM_RULES =\
  'imparfait': imparfait,
  'passé simple': (lambda x: x[:-2]),
  'conditionnel': (lambda x: x[:-1] if x[-2:] == 're' else x),
- 'présent subjonctif': présent_subjonctif,
- 'imparfait subjonctif': (lambda x: x[:-2])}
+ 'subjonctif présent': présent_subjonctif,
+ 'subjonctif imparfait': (lambda x: x[:-2])}
 
 # Simple Tense endings
-# TODO: add the compound tenses and handle stem- and spelling-change
+# TODO: handle stem- and spelling-change
 # verbs
 _ENDINGS =\
     {'er':
@@ -81,8 +79,8 @@ _ENDINGS =\
       'passé simple': Category('ai', 'as', 'a', 'âmes', 'âtes', 'èrent'),
       'futur': Category('ai', 'as', 'a', 'ons', 'ez', 'ont'),
       'conditionnel': Category('ais', 'ais', 'ait', 'ions', 'iez', 'aient'),
-      'présent subjonctif': Category('e', 'es', 'e', 'ions', 'iez', 'ent'),
-      'imparfait subjonctif': Category('asse', 'asses', 'ât',
+      'subjonctif présent': Category('e', 'es', 'e', 'ions', 'iez', 'ent'),
+      'subjonctif imparfait': Category('asse', 'asses', 'ât',
                                        'assions', 'assiez', 'assent')},
      'ir':
      {'présent': Category('is', 'is', 'it', 'issons', 'issez', 'issent'),
@@ -90,8 +88,8 @@ _ENDINGS =\
       'passé simple': Category('is', 'is', 'it', 'îmes', 'îtes', 'irent'),
       'futur': Category('ai', 'as', 'a', 'ons', 'ez', 'ont'),
       'conditionnel': Category('ais', 'ais', 'ait', 'ions', 'iez', 'aient'),
-      'présent subjonctif': Category('e', 'es', 'e', 'ions', 'iez', 'ent'),
-      'imparfait subjonctif': Category('isse', 'isses', 'ît',
+      'subjonctif présent': Category('e', 'es', 'e', 'ions', 'iez', 'ent'),
+      'subjonctif imparfait': Category('isse', 'isses', 'ît',
                                        'issions', 'issiez', 'issent')
   },
      're':
@@ -100,8 +98,8 @@ _ENDINGS =\
       'passé simple': Category('is', 'is', 'it', 'îmes', 'îtes', 'irent'),
       'futur': Category('ai', 'as', 'a', 'ons', 'ez', 'ont'),
       'conditionnel': Category('ais', 'ais', 'ait', 'ions', 'iez', 'aient'),
-      'présent subjonctif': Category('e', 'es', 'e', 'ions', 'iez', 'ent'),
-      'imparfait subjonctif': Category('isse', 'isses', 'ît',
+      'subjonctif présent': Category('e', 'es', 'e', 'ions', 'iez', 'ent'),
+      'subjonctif imparfait': Category('isse', 'isses', 'ît',
                                        'issions', 'issiez', 'issent')
   }
 }
@@ -133,26 +131,48 @@ def construct_inflection(infinitive, tense):
     Given an infinitive and tense, constructs the combined
     stem and ending, and then prepends the appropriate pronoun
     '''
-    stem_and_ending = construct_stem_and_ending(infinitive, tense)
-    return Category._make([(f(c), c) for f, c in zip(_PRONOUNS,
-                                                     stem_and_ending)])
+    if tense in ['subjonctif présent',
+                 'subjonctif imparfait']:
+        stem_and_ending = construct_stem_and_ending(infinitive, tense)
+        inflection = [("qu'" if f(c)[0] in _VOWELS else 'que', f(c), c)
+                      for f, c in zip(_PRONOUNS, stem_and_ending)]
+
+    elif tense in ['subjonctif passé', 'subjonctif plus-que-parfait']:
+        past_participle = _construct_past_participle(infinitive)
+        inflection = [("qu'" if f(aux)[0] in _VOWELS else 'que',
+                       f(aux), aux, past_participle)
+                      for f, aux in zip(_PRONOUNS,
+                                        _COMPOUND_TENSE[tense])]
+
+    elif tense in ['passé composé',
+                   'plus-que-parfait',
+                   'futur antérieur',
+                   'passé antérieur',
+                   'passé du conditionnel']:
+        past_participle = _construct_past_participle(infinitive)
+        inflection = [(f(aux), aux, past_participle)
+                      for f, aux in zip(_PRONOUNS,
+                                        _COMPOUND_TENSE[tense])]
+    else:
+        stem_and_ending = construct_stem_and_ending(infinitive, tense)
+        inflection = [(f(c), c) for f, c in zip(_PRONOUNS,
+                                                stem_and_ending)]
+
+    return Category._make(inflection)
 
 
-def output_normal_view(infinitive, tense, conj):
-    '''
-    Pretty-printing for the traditional two-column output
-    of a verb conjugation
-    '''
-    return ['{}, {}:'.format(infinitive, tense),
-    ('⎯'*45), '{:<25}‖ {}'.format(_FPS_FORMAT.format(*conj.fps) if
-                                  infinitive[0] in _VOWELS else
-                                  _STD_FORMAT.format(*conj.fps),
-                                  _STD_FORMAT.format(*conj.fpp)),
-    '{:<25}‖ {}'.format(_STD_FORMAT.format(*conj.sps),
-                        _STD_FORMAT.format(*conj.spp)),
-    '{:<25}‖ {}'.format(_STD_FORMAT.format(*conj.tps),
-                        _STD_FORMAT. format(*conj.tpp))]
+def elision(word1, word2):
+    if word1 not in ['je', 'que']:
+        raise ValueError("First parameter must be 'je' or 'que'")
+    if word2[0] in _VOWELS:
+        return word1[:-1] + word2
+    return word1 + ' ' + word2
 
+
+def output_normal_view(infinitive, tense, inflection):
+    print(infinitive + ', ' + tense)
+    print('_' * 10)
+    [print(inf) for inf in inflection]
 
 def output_cloze(infinitive, tense, conj):
     '''
@@ -194,3 +214,56 @@ def output_cloze_import(infinitive, tense, translation, sound, conj):
     add_tag = [snd + ('|{}'.format(infinitive)) for snd in add_snd]
 
     return Category._make(add_tag)
+
+AUX_VERB = {'avoir': {'présent': ['ai', 'as', 'a',
+                                  'avons', 'avez', 'ont'],
+                      'imparfait': ['avais', 'avais', 'avait',
+                                    'avions', 'aviez', 'avaient'],
+                      'passé simple': ['eus', 'eus', 'eut',
+                                       'eûmes', 'eûtes', 'eurent'],
+                      'futur': ['aurai', 'auras', 'aura',
+                                'aurons', 'aurez', 'auront'],
+                      'conditionnel': ['aurais', 'aurais', 'aurait',
+                                       'aurions', 'auriez', 'auraient'],
+                      'subjonctif présent': ['aie', 'aies', 'ait',
+                                             'ayons', 'ayez', 'aient'],
+                      'subjonctif imparfait': ['eusse', 'eusses', 'eût',
+                                               'eussions', 'eussiez', 'eussent']},
+            'être': {'présent': ['suis', 'es', 'est',
+                                 'sommes', 'êtes', 'sont'],
+                     'imparfait': ['étais', 'étais', 'était',
+                                   'étions', 'étiez', 'étaient'],
+                     'passé simple': ['fus', 'fus', 'fut',
+                                      'fûmes', 'fûtes', 'furent'],
+                     'futur': ['serai', 'seras', 'sera',
+                               'serons', 'serez', 'seront'],
+                     'conditionnel': ['serais', 'serais', 'serait',
+                                      'serions', 'seriez', 'seraient'],
+                     'subjonctif présent': ['sois', 'sois', 'soit',
+                                            'soyons', 'soyez', 'soient'],
+                     'subjonctif imparfait': ['fusse', 'fusses', 'fût',
+                                              'fussions', 'fussiez', 'fussent']}}
+
+_COMPOUND_TENSE = {'passé composé': AUX_VERB['avoir']['présent'],
+                   'plus-que-parfait': AUX_VERB['avoir']['imparfait'],
+                   'passé antérieur': AUX_VERB['avoir']['passé simple'],
+                   'futur antérieur': AUX_VERB['avoir']['futur'],
+                   'passé du conditionnel': AUX_VERB['avoir']['conditionnel'],
+                   'subjonctif passé': AUX_VERB['avoir']['subjonctif présent'],
+                   'subjonctif plus-que-parfait': AUX_VERB['avoir']['subjonctif imparfait']}
+
+def _construct_past_participle(infinitive):
+    '''
+    Given an infinitive, returns the past participle for
+    the given verb
+    '''
+    ending = infinitive[-2:]
+    stem = infinitive[:-2]
+    if ending == 'er':
+        return stem + 'é'
+    elif ending == 'ir':
+        return stem + 'i'
+    elif ending == 're':
+        return stem + 'u'
+    else:
+        raise ValueError('parameter not a verb infinitive')
