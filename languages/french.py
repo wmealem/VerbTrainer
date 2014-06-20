@@ -3,6 +3,7 @@
 # Purpose: conjugate french verb tenses
 
 from category import Category
+from collections import namedtuple
 
 # French pronouns - easy way to handle the j'/je problem
 # when the first letter of the verb is a vowel
@@ -22,6 +23,7 @@ _FPS_CLOZE_FORMAT = '{0}{{{{c1::{1}::{2}, {3}}}}}'
 _STD_CLOZE_FORMAT = '{0} {{{{c1::{1}::{2}, {3}}}}}'
 _VOWELS = ('a', 'e', 'i', 'o', 'u')
 
+SimpleTenseParts = namedtuple("SimpleTenseParts", 'pronoun verb')
 
 def imparfait(infinitive):
     '''
@@ -109,7 +111,6 @@ def imparfait_subjonctif(infinitive):
     '''
     Creates the appropriate stem from the passé simple case
     '''
-
     stem = construct_inflection(infinitive, 'passé simple').tps
     return stem[:-1]
 
@@ -126,6 +127,58 @@ def construct_stem_and_ending(infinitive, tense):
     return Category._make([stem + end for end in endings])
 
 
+def construct_simple_tense(infinitive, tense):
+    stem_and_ending = construct_stem_and_ending(infinitive, tense)
+    inflection = [(f(c), c) for f, c in zip(_PRONOUNS, stem_and_ending)]
+    return Category._make([SimpleTenseParts._make(inf) for inf in inflection])
+
+
+def construct_simple_tense_output(inflection):
+    output = []
+    if inflection.fps.verb[0] in _VOWELS:
+        output.append(_FPS_FORMAT.format(inflection.fps.pronoun,
+                                         inflection.fps.verb))
+    else:
+        output.append(_STD_FORMAT.format(inflection.fps.pronoun,
+                                         inflection.fps.verb))
+    output.append(_STD_FORMAT.format(inflection.sps.pronoun,
+                                     inflection.sps.verb))
+    output.append(_STD_FORMAT.format(inflection.tps.pronoun,
+                                     inflection.tps.verb))
+    output.append(_STD_FORMAT.format(inflection.fpp.pronoun,
+                                     inflection.fpp.verb))
+    output.append(_STD_FORMAT.format(inflection.spp.pronoun,
+                                     inflection.spp.verb))
+    output.append(_STD_FORMAT.format(inflection.tpp.pronoun,
+                                     inflection.tpp.verb))
+
+    return Category._make(output)
+
+
+
+def construct_simple_tense_subjunctive(infinitive, tense):
+    stem_and_ending = construct_stem_and_ending(infinitive, tense)
+    return Category._make([("qu'" if f(c)[0] in _VOWELS else 'que', f(c), c)
+                           for f, c in zip(_PRONOUNS, stem_and_ending)])
+
+
+def construct_compound_tense(infinitive, tense):
+    past_participle = _construct_past_participle(infinitive)
+    inflection = [(f(aux), aux, past_participle)
+                  for f, aux in zip(_PRONOUNS,
+                                    _COMPOUND_TENSE[tense])]
+    return Category._make(inflection)
+
+
+def construct_compound_tense_subjunctive(infinitive, tense):
+    past_participle = _construct_past_participle(infinitive)
+    inflection = [("qu'" if f(aux)[0] in _VOWELS else 'que',
+                   f(aux), aux, past_participle)
+                  for f, aux in zip(_PRONOUNS,
+                                    _COMPOUND_TENSE[tense])]
+    return Category._make(inflection)
+
+
 def construct_inflection(infinitive, tense):
     '''
     Given an infinitive and tense, constructs the combined
@@ -133,32 +186,19 @@ def construct_inflection(infinitive, tense):
     '''
     if tense in ['subjonctif présent',
                  'subjonctif imparfait']:
-        stem_and_ending = construct_stem_and_ending(infinitive, tense)
-        inflection = [("qu'" if f(c)[0] in _VOWELS else 'que', f(c), c)
-                      for f, c in zip(_PRONOUNS, stem_and_ending)]
+        return construct_simple_tense_subjunctive(infinitive, tense)
 
     elif tense in ['subjonctif passé', 'subjonctif plus-que-parfait']:
-        past_participle = _construct_past_participle(infinitive)
-        inflection = [("qu'" if f(aux)[0] in _VOWELS else 'que',
-                       f(aux), aux, past_participle)
-                      for f, aux in zip(_PRONOUNS,
-                                        _COMPOUND_TENSE[tense])]
+        return construct_compound_tense_subjunctive(infinitive, tense)
 
     elif tense in ['passé composé',
                    'plus-que-parfait',
                    'futur antérieur',
                    'passé antérieur',
                    'passé du conditionnel']:
-        past_participle = _construct_past_participle(infinitive)
-        inflection = [(f(aux), aux, past_participle)
-                      for f, aux in zip(_PRONOUNS,
-                                        _COMPOUND_TENSE[tense])]
+        return construct_compound_tense(infinitive, tense)
     else:
-        stem_and_ending = construct_stem_and_ending(infinitive, tense)
-        inflection = [(f(c), c) for f, c in zip(_PRONOUNS,
-                                                stem_and_ending)]
-
-    return Category._make(inflection)
+        return construct_simple_tense(infinitive, tense)
 
 
 def elision(word1, word2):
