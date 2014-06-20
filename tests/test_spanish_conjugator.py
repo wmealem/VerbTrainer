@@ -95,3 +95,13 @@ class TestSpanishConjugator(unittest.TestCase):
                      'hemos vivido', 'habéis vivido', 'han vivido']]
 
         self.run_sub_tests(expected, 'pretérito perfecto')
+
+
+class TestcompoundTenses(unittest.TestCase):
+        def test_past_participle(self):
+            expected = ['hablado', 'vendido', 'vivido']
+            actual = [Spanish._construct_past_participle('hablar'),
+                      Spanish._construct_past_participle('vender'),
+                      Spanish._construct_past_participle('vivir')]
+            self.assertEqual(expected, actual
+)
