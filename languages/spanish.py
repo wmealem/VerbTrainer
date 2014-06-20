@@ -110,7 +110,8 @@ def _construct_past_participle(infinitive):
         return stem + 'ido'
     elif ending == 'ir':
         return stem + 'ido'
-
+    else:
+        raise ValueError('parameter not a verb infinitive')
 
 def construct_inflection(infinitive, tense):
     '''
