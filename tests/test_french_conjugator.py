@@ -332,8 +332,12 @@ class TestFrenchConjugator(unittest.TestCase):
         pronoun, verb = inf
         self.assertEqual("j'abandonne", '{}{}'.format(pronoun, verb))
 
-
-
+    def test_simple_tense_ouput(self):
+        expected = ['je parle', 'tu parles', 'il/elle/on parle',
+                    'nous parlons', 'vous parlez', 'ils/elles parlent']
+        inflection = French.construct_inflection('parler', 'présent')
+        actual = list(French.construct_simple_tense_output(inflection))
+        self.assertEqual(expected, actual)
 
 class TestClozeDeletionOutputRules(unittest.TestCase):
     @unittest.skip('move to output')
