@@ -3,7 +3,7 @@ Verb Trainer is a tool for practice conjugating French and Spanish, and eventual
 A discussion of the original approach is located at http://wp.me/p41P0x-26
 
 Invocation:
-	sqlite3 verb_trainer.db < verb_trainer.sql #to create and populate database
+	sqlite3 verb_trainer.db < verb_trainer.sql<br/>
         ./VerbTrainer.py
 
 Future plans include:
