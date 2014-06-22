@@ -2,7 +2,8 @@
 import languages.french as French
 import languages.spanish as Spanish
 from collections import OrderedDict
-
+import sqlite3 as sql3
+import itertools
 
 def main():
 
@@ -17,6 +18,7 @@ def main():
             break
 
     goodbye(language)
+
 
 def conjugate_verb(language):
     tenses, conjugator, view, cloze, export = get_language_tools(language)
@@ -53,9 +55,19 @@ def conjugate_verb(language):
                 break
 
 
+def get_tenses(language):
+    with sql3.connect('verb_trainer.db') as con:
+        cur = con.cursor()
+        cur.execute("SELECT tense_name FROM tenses WHERE language_id = "
+                    "(SELECT language_id FROM languages WHERE language_name = ?)",
+                    (language,))
+        rows = cur.fetchall()
+        return list(itertools.chain(*rows))
+
+
 def get_language_tools(language):
     if language == 'French':
-        tenses = French._TENSES
+        tenses = get_tenses('française')
         conjugator = French.construct_inflection
         view = French.output_normal_view
         cloze = French.output_cloze

@@ -4,6 +4,7 @@
 
 from category import Category
 from collections import namedtuple
+import sqlite3
 
 # French pronouns - easy way to handle the j'/je problem
 # when the first letter of the verb is a vowel
@@ -24,6 +25,7 @@ _STD_CLOZE_FORMAT = '{0} {{{{c1::{1}::{2}, {3}}}}}'
 _VOWELS = ('a', 'e', 'i', 'o', 'u')
 
 SimpleTenseParts = namedtuple("SimpleTenseParts", 'pronoun verb')
+CompoundTenseParts = namedtuple('CompoundTenseParts', 'pronoun aux past_participle')
 
 def imparfait(infinitive):
     '''
@@ -41,25 +43,11 @@ def présent_subjonctif(infinitive):
     return stem.rsplit('ent')[0]
 
 
-_TENSES =\
-          [# simple tenses
-              'présent',
-              'passé simple',
-              'imparfait',
-              'futur',
-              'conditionnel',
-              'subjonctif présent',
-              'subjonctif imparfait',
-           # compound tenses
-              'passé composé',
-              'plus-que-parfait',
-              'futur antérieur',
-              'passé antérieur',
-              'subjonctif passé',
-              'subjonctif plus-que-parfait',
-              'passé du conditionnel'
-          ]
-
+_SIMPLE_TENSES = ['présent',
+                  'passé simple',
+                  'imparfait',
+                  'futur',
+                  'conditionnel']
 
 # Logic for handling the different stem changes of regular verbs
 _STEM_RULES =\
@@ -70,41 +58,6 @@ _STEM_RULES =\
  'conditionnel': (lambda x: x[:-1] if x[-2:] == 're' else x),
  'subjonctif présent': présent_subjonctif,
  'subjonctif imparfait': (lambda x: x[:-2])}
-
-# Simple Tense endings
-# TODO: handle stem- and spelling-change
-# verbs
-_ENDINGS =\
-    {'er':
-     {'présent': Category('e', 'es', 'e', 'ons', 'ez', 'ent'),
-      'imparfait': Category('ais', 'ais', 'ait', 'ions', 'iez', 'aient'),
-      'passé simple': Category('ai', 'as', 'a', 'âmes', 'âtes', 'èrent'),
-      'futur': Category('ai', 'as', 'a', 'ons', 'ez', 'ont'),
-      'conditionnel': Category('ais', 'ais', 'ait', 'ions', 'iez', 'aient'),
-      'subjonctif présent': Category('e', 'es', 'e', 'ions', 'iez', 'ent'),
-      'subjonctif imparfait': Category('asse', 'asses', 'ât',
-                                       'assions', 'assiez', 'assent')},
-     'ir':
-     {'présent': Category('is', 'is', 'it', 'issons', 'issez', 'issent'),
-      'imparfait': Category('ais', 'ais', 'ait', 'ions', 'iez', 'aient'),
-      'passé simple': Category('is', 'is', 'it', 'îmes', 'îtes', 'irent'),
-      'futur': Category('ai', 'as', 'a', 'ons', 'ez', 'ont'),
-      'conditionnel': Category('ais', 'ais', 'ait', 'ions', 'iez', 'aient'),
-      'subjonctif présent': Category('e', 'es', 'e', 'ions', 'iez', 'ent'),
-      'subjonctif imparfait': Category('isse', 'isses', 'ît',
-                                       'issions', 'issiez', 'issent')
-  },
-     're':
-     {'présent': Category('s', 's', '', 'ons', 'ez', 'ent'),
-      'imparfait': Category('ais', 'ais', 'ait', 'ions', 'iez', 'aient'),
-      'passé simple': Category('is', 'is', 'it', 'îmes', 'îtes', 'irent'),
-      'futur': Category('ai', 'as', 'a', 'ons', 'ez', 'ont'),
-      'conditionnel': Category('ais', 'ais', 'ait', 'ions', 'iez', 'aient'),
-      'subjonctif présent': Category('e', 'es', 'e', 'ions', 'iez', 'ent'),
-      'subjonctif imparfait': Category('isse', 'isses', 'ît',
-                                       'issions', 'issiez', 'issent')
-  }
-}
 
 
 def imparfait_subjonctif(infinitive):
@@ -123,7 +76,14 @@ def construct_stem_and_ending(infinitive, tense):
     '''
     stem = _STEM_RULES[tense](infinitive)
     verb_type = infinitive[-2:]
-    endings = _ENDINGS[verb_type][tense]
+    with sqlite3.connect('verb_trainer.db') as con:
+        cur = con.cursor()
+        cur.execute("SELECT fps, sps, tps, fpp, spp, tpp FROM tense_endings"
+                    "WHERE verb_type = ? AND tense_id = "
+                    "(SELECT tense_id FROM tenses WHERE tense_name = ?)",
+                    (verb_type, tense))
+
+        endings = cur.fetchone()
     return Category._make([stem + end for end in endings])
 
 
@@ -211,8 +171,13 @@ def elision(word1, word2):
 
 def output_normal_view(infinitive, tense, inflection):
     print(infinitive + ', ' + tense)
-    print('_' * 10)
-    [print(inf) for inf in inflection]
+    print('─' * 50)
+    if tense in _SIMPLE_TENSES:
+        out = construct_simple_tense_output(inflection)
+        print('{:<25}║  {}'.format(out.fps, out.fpp))
+        print('{:<25}║  {}'.format(out.sps, out.spp))
+        print('{:<25}║  {}'.format(out.tps, out.tpp))
+
 
 def output_cloze(infinitive, tense, conj):
     '''
